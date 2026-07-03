@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>訪客通行申請</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4f7fb;
+      --surface: #ffffff;
+      --surface-2: #eef4f8;
+      --text: #152033;
+      --muted: #617084;
+      --line: #d8e1ea;
+      --field: #fbfcfe;
+      --primary: #176b87;
+      --primary-dark: #0f4c5c;
+      --accent: #d56a3d;
+      --danger: #bd2f2f;
+      --success: #1f7a4d;
+      --shadow: 0 18px 45px rgba(21, 32, 51, .09);
+      --radius: 8px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", sans-serif;
+      background:
+        linear-gradient(180deg, rgba(23, 107, 135, .08), transparent 280px),
+        var(--bg);
+      color: var(--text);
+    }
+
+    button, input, select, textarea { font: inherit; }
+
+    .page {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      padding: 28px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 18px;
+    }
+
+    .title-group h1 {
+      margin: 0;
+      font-size: clamp(1.5rem, 2.4vw, 2.3rem);
+      line-height: 1.15;
+      letter-spacing: 0;
+    }
+
+    .title-group p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: .96rem;
+    }
+
+    .company-pill {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
+      padding: 10px 14px;
+      border: 1px solid rgba(23, 107, 135, .22);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, .78);
+      color: var(--primary-dark);
+      white-space: nowrap;
+    }
+
+    .company-pill strong { font-size: .96rem; }
+    .company-pill span { font-size: .8rem; color: var(--muted); }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 330px minmax(0, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .summary {
+      position: sticky;
+      top: 18px;
+      overflow: hidden;
+    }
+
+    .summary-head {
+      padding: 20px;
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      color: #fff;
+    }
+
+    .summary-head h2 {
+      margin: 0;
+      font-size: 1.14rem;
+      letter-spacing: 0;
+    }
+
+    .summary-head p {
+      margin: 6px 0 0;
+      color: rgba(255, 255, 255, .78);
+      font-size: .9rem;
+    }
+
+    .summary-list {
+      display: grid;
+      gap: 14px;
+      padding: 18px 20px 20px;
+    }
+
+    .summary-item {
+      display: grid;
+      gap: 4px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .summary-item:last-child {
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+
+    .summary-item span {
+      color: var(--muted);
+      font-size: .78rem;
+    }
+
+    .summary-item strong {
+      font-size: .98rem;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+
+    .form-panel { padding: 22px; }
+
+    .section {
+      padding: 0 0 22px;
+      margin-bottom: 22px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section:last-of-type {
+      padding-bottom: 0;
+      margin-bottom: 0;
+      border-bottom: 0;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .section-title h2 {
+      margin: 0;
+      font-size: 1.05rem;
+      letter-spacing: 0;
+    }
+
+    .section-title span {
+      color: var(--muted);
+      font-size: .82rem;
+      white-space: nowrap;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .field { display: grid; gap: 6px; }
+    .field.full { grid-column: 1 / -1; }
+
+    label {
+      color: #465569;
+      font-size: .82rem;
+      font-weight: 700;
+    }
+
+    .req { color: var(--danger); }
+
+    input, select, textarea {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid #cfd9e4;
+      border-radius: var(--radius);
+      background: var(--field);
+      color: var(--text);
+      padding: 10px 12px;
+      outline: none;
+      transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+
+    textarea {
+      min-height: 96px;
+      line-height: 1.55;
+      resize: vertical;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(23, 107, 135, .13);
+    }
+
+    input[readonly] {
+      background: #eef3f7;
+      color: #44546a;
+    }
+
+    select:disabled {
+      color: var(--muted);
+      background: #eef3f7;
+    }
+
+    .inline-check {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 16px;
+      color: #465569;
+      font-weight: 700;
+    }
+
+    .inline-check input {
+      width: 18px;
+      min-height: 18px;
+      accent-color: var(--primary);
+    }
+
+    .companions {
+      display: grid;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .visitor-card {
+      position: relative;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface-2);
+    }
+
+    .visitor-card h3 {
+      margin: 0 34px 12px 0;
+      font-size: .95rem;
+    }
+
+    .icon-button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 32px;
+      height: 32px;
+      border: 1px solid transparent;
+      border-radius: var(--radius);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .icon-button:hover {
+      border-color: rgba(189, 47, 47, .2);
+      background: rgba(189, 47, 47, .08);
+      color: var(--danger);
+    }
+
+    .secondary-button, .submit-button, .back-button {
+      min-height: 46px;
+      border: 0;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .secondary-button {
+      width: 100%;
+      border: 1px dashed rgba(23, 107, 135, .45);
+      background: #f7fbfd;
+      color: var(--primary-dark);
+    }
+
+    .secondary-button:hover { background: #edf7fb; }
+
+    .actions {
+      display: grid;
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .submit-button, .back-button {
+      width: 100%;
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .submit-button:hover, .back-button:hover { background: var(--primary-dark); }
+    .submit-button:disabled { cursor: wait; opacity: .65; }
+
+    .error {
+      display: none;
+      border: 1px solid rgba(189, 47, 47, .2);
+      border-radius: var(--radius);
+      background: #fff3f1;
+      color: var(--danger);
+      padding: 10px 12px;
+      font-weight: 700;
+    }
+
+    .error.show { display: block; }
+
+    .status {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .status.show { display: flex; }
+
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 3px solid #cdd8e2;
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+
+    .result {
+      display: none;
+      padding: 42px 22px;
+      text-align: center;
+    }
+
+    .result.show { display: block; }
+
+    .result-mark {
+      width: 58px;
+      height: 58px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 16px;
+      border-radius: 50%;
+      background: rgba(31, 122, 77, .12);
+      color: var(--success);
+      font-size: 2rem;
+      font-weight: 900;
+    }
+
+    .result h2 {
+      margin: 0;
+      color: var(--success);
+      font-size: 1.35rem;
+    }
+
+    .result p {
+      margin: 8px auto 22px;
+      max-width: 420px;
+      color: var(--muted);
+    }
+
+    .hidden { display: none !important; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 860px) {
+      .page { padding: 18px; }
+      .topbar { align-items: stretch; flex-direction: column; }
+      .company-pill { align-items: flex-start; white-space: normal; }
+      .layout { grid-template-columns: 1fr; }
+      .summary { position: static; }
+      .summary-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 620px) {
+      .page { padding: 14px; }
+      .form-panel { padding: 16px; }
+      .summary-list, .grid { grid-template-columns: 1fr; }
+      .section-title { align-items: flex-start; flex-direction: column; gap: 4px; }
+      .section-title span { white-space: normal; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="topbar">
+      <div class="title-group">
+        <h1>訪客通行申請</h1>
+        <p>親家市政廣場訪客登記表</p>
+      </div>
+      <div class="company-pill" aria-label="預設拜訪公司">
+        <strong>拜訪公司：27A</strong>
+        <span>公司代碼 1127001</span>
+      </div>
+    </header>
+
+    <div class="layout" id="formSection">
+      <aside class="panel summary">
+        <div class="summary-head">
+          <h2>拜訪資訊</h2>
+          <p>已自動帶入指定公司</p>
+        </div>
+        <div class="summary-list">
+          <div class="summary-item">
+            <span>大樓</span>
+            <strong>親家市政廣場</strong>
+          </div>
+          <div class="summary-item">
+            <span>地址</span>
+            <strong>臺中市西屯區市政北七路186號</strong>
+          </div>
+          <div class="summary-item">
+            <span>拜訪公司</span>
+            <strong id="summaryCompany">27A (1127001)</strong>
+          </div>
+        </div>
+      </aside>
+
+      <section class="panel form-panel">
+        <form id="visitorForm" novalidate>
+          <section class="section">
+            <div class="section-title">
+              <h2>拜訪時間與事由</h2>
+              <span>請填寫預計到訪區間</span>
+            </div>
+            <div class="grid">
+              <div class="field">
+                <label for="visitDate">日期 <span class="req">*</span></label>
+                <input id="visitDate" type="date" required>
+              </div>
+              <div class="field">
+                <label for="startTime">開始時間 <span class="req">*</span></label>
+                <input id="startTime" type="time" required>
+              </div>
+              <div class="field">
+                <label for="endTime">結束時間 <span class="req">*</span></label>
+                <input id="endTime" type="time" required>
+              </div>
+              <div class="field full">
+                <label for="reason">拜訪事由 <span class="req">*</span></label>
+                <textarea id="reason" maxlength="250" placeholder="請輸入拜訪事由" required></textarea>
+              </div>
+            </div>
+          </section>
+
+          <section class="section">
+            <div class="section-title">
+              <h2>訪客資料</h2>
+              <span>主要聯絡人資料</span>
+            </div>
+            <div class="grid">
+              <div class="field">
+                <label for="visitorName">訪客姓名 <span class="req">*</span></label>
+                <input id="visitorName" type="text" maxlength="20" autocomplete="name" required>
+              </div>
+              <div class="field">
+                <label for="visitorCompany">公司名稱 <span class="req">*</span></label>
+                <input id="visitorCompany" type="text" maxlength="20" autocomplete="organization" required>
+              </div>
+              <div class="field">
+                <label for="visitorMobile">手機 <span class="req">*</span></label>
+                <input id="visitorMobile" type="tel" inputmode="tel" autocomplete="tel" required>
+              </div>
+              <div class="field">
+                <label for="visitorEmail">Email <span class="req">*</span></label>
+                <input id="visitorEmail" type="email" autocomplete="email" required>
+              </div>
+            </div>
+
+            <label class="inline-check">
+              <input id="hasCompanions" type="checkbox">
+              有同行訪客
+            </label>
+
+            <div id="companionsWrap" class="companions hidden">
+              <div id="companionsList" class="companions"></div>
+              <button class="secondary-button" id="addCompanion" type="button">新增同行訪客</button>
+            </div>
+          </section>
+
+          <div class="actions">
+            <div class="error" id="formError"></div>
+            <div class="status" id="statusLine">
+              <span class="spinner"></span>
+              <span id="statusText">處理中</span>
+            </div>
+            <button class="submit-button" id="submitButton" type="submit">送出申請</button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <section class="panel result" id="resultSection">
+      <div class="result-mark">✓</div>
+      <h2>申請已送出</h2>
+      <p>系統已收到訪客通行申請，請等待管理單位審核。</p>
+      <button class="back-button" id="newApplication" type="button">填寫下一筆</button>
+    </section>
+  </main>
+
+  <script>
+    const API_BASE = 'https://vas-api.pss-group-prod.com/vas-pss/api/v1';
+    const DEFAULT_VISIT = {
+      buildingNo: 'IC0481',
+      buildingName: '親家市政廣場',
+      enterpriseId: '1127001',
+      enterpriseName: '27A',
+      enterpriseDisplay: '27A (1127001)',
+      hostName: 'finance@wdkingtech.com',
+      hostEmail: 'finance@wdkingtech.com'
+    };
+
+    let guestToken = '';
+    let companionCount = 0;
+    let isSubmitting = false;
+
+    const $ = id => document.getElementById(id);
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    function setStatus(message, active) {
+      $('statusText').textContent = message;
+      $('statusLine').classList.toggle('show', active);
+      $('submitButton').disabled = active;
+    }
+
+    function showError(message) {
+      $('formError').textContent = message;
+      $('formError').classList.add('show');
+    }
+
+    function clearError() {
+      $('formError').textContent = '';
+      $('formError').classList.remove('show');
+    }
+
+    function pad2(number) {
+      return String(number).padStart(2, '0');
+    }
+
+    function escapeHtml(value) {
+      const div = document.createElement('div');
+      div.textContent = value || '';
+      return div.innerHTML;
+    }
+
+    function formatDateTime(date, time) {
+      const value = new Date(`${date}T${time}:00`);
+      return `${value.getFullYear()}-${pad2(value.getMonth() + 1)}-${pad2(value.getDate())} ${pad2(value.getHours())}:${pad2(value.getMinutes())}:00`;
+    }
+
+    async function apiFetch(path, options = {}) {
+      const response = await fetch(`${API_BASE}/${path}`, {
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          ...(options.headers || {})
+        }
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.ReturnMsg || `HTTP ${response.status}`);
+      return data;
+    }
+
+    async function ensureGuestToken() {
+      if (guestToken) return guestToken;
+      const data = await apiFetch('vas/guest');
+      if (data.ReturnCode !== '0' || !data.AccessToken) {
+        throw new Error(data.ReturnMsg || '無法取得訪客權限');
+      }
+      guestToken = data.AccessToken;
+      return guestToken;
+    }
+
+    function fillDefaultTime() {
+      const now = new Date();
+      const startHour = Math.min(now.getHours() + 1, 23);
+      const endHour = Math.min(now.getHours() + 2, 23);
+      $('visitDate').value = now.toISOString().slice(0, 10);
+      $('startTime').value = `${pad2(startHour)}:00`;
+      $('endTime').value = `${pad2(endHour)}:00`;
+    }
+
+    function addCompanionCard() {
+      companionCount += 1;
+      const card = document.createElement('div');
+      card.className = 'visitor-card';
+      card.dataset.companion = String(companionCount);
+      card.innerHTML = `
+        <button class="icon-button" type="button" aria-label="移除同行訪客">×</button>
+        <h3>同行訪客 #${companionCount}</h3>
+        <div class="grid">
+          <div class="field">
+            <label>姓名 <span class="req">*</span></label>
+            <input class="companion-name" type="text" maxlength="20">
+          </div>
+          <div class="field">
+            <label for="visitorCompany">公司名稱 <span class="req">*</span></label>
+            <input class="companion-company" type="text" maxlength="20">
+          </div>
+          <div class="field">
+            <label for="visitorMobile">手機 <span class="req">*</span></label>
+            <input class="companion-mobile" type="tel" inputmode="tel">
+          </div>
+          <div class="field">
+            <label for="visitorEmail">Email <span class="req">*</span></label>
+            <input class="companion-email" type="email">
+          </div>
+        </div>
+      `;
+      card.querySelector('.icon-button').addEventListener('click', () => {
+        card.remove();
+        reindexCompanions();
+      });
+      $('companionsList').appendChild(card);
+    }
+
+    function reindexCompanions() {
+      [...$('companionsList').querySelectorAll('.visitor-card')].forEach((card, index) => {
+        card.querySelector('h3').textContent = `同行訪客 #${index + 1}`;
+      });
+      companionCount = $('companionsList').querySelectorAll('.visitor-card').length;
+    }
+
+    function collectCompanions(defaultCompany) {
+      return [...$('companionsList').querySelectorAll('.visitor-card')]
+        .map(card => ({
+          VisitorName: card.querySelector('.companion-name').value.trim(),
+          VisitorCompany: card.querySelector('.companion-company').value.trim() || defaultCompany,
+          VisitorPhone: card.querySelector('.companion-mobile').value.trim(),
+          VisitorEmail: card.querySelector('.companion-email').value.trim()
+        }))
+        .filter(visitor => visitor.VisitorName);
+    }
+
+    function validate(values) {
+      if (!values.visitDate) return '請選擇日期';
+      if (!values.startTime) return '請選擇開始時間';
+      if (!values.endTime) return '請選擇結束時間';
+      if (values.startTime >= values.endTime) return '結束時間必須晚於開始時間';
+      if (!values.reason) return '請填寫拜訪事由';
+      if (!values.visitorName) return '請填寫訪客姓名';
+      if (!values.visitorCompany) return '請填寫訪客公司';
+      if (!values.visitorMobile) return '請填寫訪客手機';
+      if (!emailPattern.test(values.visitorEmail)) return '請填寫正確的訪客 Email';
+      return '';
+    }
+
+    async function handleSubmit(event) {
+      event.preventDefault();
+      if (isSubmitting) return;
+      clearError();
+
+      const values = {
+        visitDate: $('visitDate').value,
+        startTime: $('startTime').value,
+        endTime: $('endTime').value,
+        reason: $('reason').value.trim(),
+        visitorName: $('visitorName').value.trim(),
+        visitorCompany: $('visitorCompany').value.trim(),
+        visitorMobile: $('visitorMobile').value.trim(),
+        visitorEmail: $('visitorEmail').value.trim()
+      };
+
+      const validationMessage = validate(values);
+      if (validationMessage) {
+        showError(validationMessage);
+        return;
+      }
+
+      isSubmitting = true;
+      setStatus('送出申請中', true);
+
+      try {
+        const token = await ensureGuestToken();
+        const visitors = [{
+          VisitorNo: 1,
+          VisitorName: values.visitorName,
+          VisitorCompany: values.visitorCompany,
+          VisitorPhone: values.visitorMobile,
+          VisitorEmail: values.visitorEmail
+        }];
+
+        if ($('hasCompanions').checked) {
+          collectCompanions(values.visitorCompany).forEach(visitor => {
+            visitors.push({ VisitorNo: visitors.length + 1, ...visitor });
+          });
+        }
+
+        const payload = {
+          ApplyNo: String(Date.now()),
+          BuildingNo: DEFAULT_VISIT.buildingNo,
+          EnterpriseId: DEFAULT_VISIT.enterpriseId,
+          EmpName: DEFAULT_VISIT.hostName,
+          EmpEmail: DEFAULT_VISIT.hostEmail,
+          VisitorCompany: values.visitorCompany,
+          VisitorCount: visitors.length,
+          VisitorStartTime: formatDateTime(values.visitDate, values.startTime),
+          VisitorEndTime: formatDateTime(values.visitDate, values.endTime),
+          VisitorReason: values.reason,
+          VisitorStatus: 'A',
+          VisitorList: visitors
+        };
+
+        const result = await apiFetch('vas/visitor-application', {
+          method: 'POST',
+          body: JSON.stringify(payload),
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (result.ReturnCode !== '0') {
+          throw new Error(result.ReturnMsg || '送出失敗');
+        }
+
+        $('formSection').classList.add('hidden');
+        $('resultSection').classList.add('show');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (error) {
+        showError(`送出失敗：${error.message}`);
+      } finally {
+        isSubmitting = false;
+        setStatus('', false);
+      }
+    }
+
+    function resetForm() {
+      $('visitorForm').reset();
+      clearError();
+      $('companionsList').innerHTML = '';
+      $('companionsWrap').classList.add('hidden');
+      companionCount = 0;
+      fillDefaultTime();
+      $('formSection').classList.remove('hidden');
+      $('resultSection').classList.remove('show');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    $('hasCompanions').addEventListener('change', event => {
+      const enabled = event.target.checked;
+      $('companionsWrap').classList.toggle('hidden', !enabled);
+      if (enabled && !$('companionsList').children.length) addCompanionCard();
+      if (!enabled) {
+        $('companionsList').innerHTML = '';
+        companionCount = 0;
+      }
+    });
+
+    $('addCompanion').addEventListener('click', addCompanionCard);
+    $('visitorForm').addEventListener('submit', handleSubmit);
+    $('newApplication').addEventListener('click', resetForm);
+
+    $('summaryCompany').textContent = escapeHtml(DEFAULT_VISIT.enterpriseDisplay);
+    fillDefaultTime();
+  </script>
+</body>
+</html>
