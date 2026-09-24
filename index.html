@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>訪客通行申請</title>
+  <title>訪客登記｜親家市政廣場</title>
   <style>
     :root {
       color-scheme: light;
@@ -402,13 +402,13 @@
       .section-title span { white-space: normal; }
     }
   </style>
-</head>
-<body>
+<meta name="description" content="親家市政廣場訪客服務：訪客登記、業主登入與申請確認。"><link rel="icon" href="./favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="./style.css"></head>
+<body><header class="site-header"><div class="site-head-inner"><a class="site-brand" href="./index.html"><span class="brand-mark" aria-hidden="true">親</span><span>親家市政廣場<span class="brand-sub">訪客服務</span></span></a><nav class="site-nav" aria-label="服務分頁"><a href="./index.html" aria-current="page">訪客登記</a><a href="./owner.html">業主管理</a></nav></div></header>
   <main class="page">
     <header class="topbar">
       <div class="title-group">
-        <h1>訪客通行申請</h1>
-        <p>親家市政廣場訪客登記表</p>
+        <h1>訪客登記</h1>
+        <p>請填寫拜訪資料，送出後由業主確認。</p>
       </div>
       <div class="company-pill" aria-label="預設拜訪公司">
         <strong>拜訪公司：27A</strong>
@@ -528,8 +528,8 @@
       enterpriseId: '1127001',
       enterpriseName: '27A',
       enterpriseDisplay: '27A (1127001)',
-      hostName: 'finance@wdkingtech.com',
-      hostEmail: 'finance@wdkingtech.com'
+      hostName: 'qr_code@wdkingtech.com',
+      hostEmail: 'qr_code@wdkingtech.com'
     };
 
     let guestToken = '';
@@ -597,7 +597,7 @@
       const now = new Date();
       const startHour = Math.min(now.getHours() + 1, 23);
       const endHour = Math.min(now.getHours() + 2, 23);
-      $('visitDate').value = now.toISOString().slice(0, 10);
+      $('visitDate').value = `${now.getFullYear()}-${pad2(now.getMonth()+1)}-${pad2(now.getDate())}`;
       $('startTime').value = `${pad2(startHour)}:00`;
       $('endTime').value = `${pad2(endHour)}:00`;
     }
@@ -773,5 +773,5 @@
     $('summaryCompany').textContent = escapeHtml(DEFAULT_VISIT.enterpriseDisplay);
     fillDefaultTime();
   </script>
-</body>
+<footer class="site-footer"><span>親家市政廣場 · 訪客服務</span><a href="https://shanehuang-bit.github.io/qrcode/" target="_blank" rel="noopener noreferrer">開啟原系統 ↗</a></footer></body>
 </html>

@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="zh-TW" data-bs-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>業主管理｜親家市政廣場</title>
+<style>
+500;600;700&display=swap');
+:root {
+  --theme: #249d79;
+  --bg: #1d2835;
+  --bg-2: #232f3d;
+  --bg-input: #1a2431;
+  --border: #35434a;
+  --text: #a8b6bc;
+  --text-heading: #ffffff;
+  --text-muted: #798e98;
+  --danger: #e00000;
+  --success: #148922;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Chakra Petch', 'Inter', sans-serif;
+  background: radial-gradient(1200px 600px at 80% -10%, rgba(36,157,121,.12), transparent 60%),
+              radial-gradient(900px 500px at 0% 110%, rgba(36,157,121,.08), transparent 55%), var(--bg);
+  color: var(--text); min-height: 100vh;
+}
+.container { max-width: 960px; margin: 0 auto; padding: 24px; }
+
+/* ===== Cards ===== */
+.card {
+  background: var(--bg-2); border: 1px solid var(--border); border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.3); padding: 28px; margin-bottom: 20px;
+  transition: box-shadow .2s;
+}
+.card:hover { box-shadow: 0 4px 24px rgba(0,0,0,.4); }
+
+/* ===== Typography ===== */
+h1 { font-size: 22px; font-weight: 700; letter-spacing: .5px; color: var(--text-heading); text-transform: uppercase; }
+h2 {
+  font-size: 13px; font-weight: 600; color: var(--text-heading); margin-bottom: 16px;
+  padding-bottom: 10px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: .5px;
+}
+h2::before {
+  content: ''; display: inline-block; width: 3px; height: 16px;
+  background: var(--theme); border-radius: 2px; flex-shrink: 0; box-shadow: 0 0 6px rgba(36,157,121,.6);
+}
+.subtitle { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; }
+
+/* ===== Forms ===== */
+.form-row { display: flex; gap: 12px; flex-wrap: wrap; }
+.form-group { flex: 1; min-width: 180px; margin-bottom: 16px; }
+.form-group.full { flex: 0 0 100%; }
+label { display: block; font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 5px; text-transform: uppercase; letter-spacing: .3px; }
+label .req { color: var(--danger); }
+input, select, textarea {
+  width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px;
+  font-size: 14px; transition: all .2s; background: var(--bg-input); font-family: inherit;
+  color: var(--text-heading);
+}
+input:hover, select:hover, textarea:hover { border-color: #44555e; }
+input:focus, select:focus, textarea:focus {
+  outline: none; border-color: var(--theme); box-shadow: 0 0 0 4px rgba(36,157,121,.15);
+}
+textarea { resize: vertical; min-height: 56px; line-height: 1.5; }
+select {
+  appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23798e98' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; cursor: pointer;
+}
+select option { background: var(--bg-2); color: var(--text-heading); }
+input[readonly] { opacity: .7; }
+
+/* ===== Login ===== */
+.login-section { text-align: center; max-width: 400px; margin: 60px auto; padding: 48px 36px; }
+.login-section h1 { font-size: 26px; margin-bottom: 4px; }
+.login-section .login-logo { width: 56px; height: 56px; margin: 0 auto 16px; background: var(--theme); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 28px; color: #fff; box-shadow: 0 4px 12px rgba(36,157,121,.3); }
+.login-btn, .submit-btn {
+  width: 100%; padding: 12px; border: none; border-radius: 10px;
+  font-size: 15px; font-weight: 700; color: #fff;
+  background: var(--theme); font-family: inherit; letter-spacing: .5px; text-transform: uppercase;
+  cursor: pointer; transition: all .2s;
+}
+.login-btn:hover, .submit-btn:hover { transform: translateY(-1px); filter: brightness(1.1); box-shadow: 0 4px 12px rgba(36,157,121,.35); }
+.login-btn:active, .submit-btn:active { transform: translateY(0); }
+.login-btn:disabled, .submit-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
+.error-msg { color: var(--danger); font-size: 13px; margin-top: 8px; padding: 8px 12px; background: rgba(224,0,0,.12); border: 1px solid rgba(224,0,0,.35); border-radius: 8px; display: none; }
+.error-msg:not(.hidden) { display: block; }
+.success-msg { color: var(--success); font-size: 13px; margin-top: 8px; }
+
+/* ===== Header bar ===== */
+.header-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.header-left { display: flex; flex-direction: column; gap: 2px; }
+.header-left h1 { font-size: 20px; }
+.building-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(36,157,121,.15); border: 1px solid var(--theme); color: var(--theme);
+  padding: 4px 12px; border-radius: 8px; font-size: 12px; font-weight: 600;
+  letter-spacing: .3px;
+}
+.header-right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.user-badge {
+  display: flex; align-items: center; gap: 8px; padding: 6px 14px 6px 10px;
+  background: rgba(255,255,255,.04); border: 1px solid var(--border); border-radius: 10px; font-size: 13px; color: var(--text);
+}
+.user-avatar {
+  width: 28px; height: 28px; background: var(--theme);
+  border-radius: 8px; display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 13px; font-weight: 700;
+}
+.logout-btn {
+  padding: 8px 16px; border: 1px solid var(--border); border-radius: 10px;
+  background: transparent; font-size: 13px; font-weight: 600; color: var(--text); font-family: inherit;
+  cursor: pointer; transition: all .2s;
+}
+.logout-btn:hover { border-color: var(--danger); color: var(--danger); background: rgba(224,0,0,.1); }
+
+/* ===== Toggle ===== */
+.toggle-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.toggle { position: relative; width: 44px; height: 24px; cursor: pointer; flex-shrink: 0; }
+.toggle input { display: none; }
+.toggle .slider {
+  position: absolute; inset: 0; background: #44555e; border-radius: 12px; transition: .3s;
+}
+.toggle .slider::before {
+  content: ''; position: absolute; left: 3px; top: 3px; width: 18px; height: 18px;
+  background: #fff; border-radius: 50%; transition: .3s; box-shadow: 0 1px 3px rgba(0,0,0,.15);
+}
+.toggle input:checked + .slider { background: var(--theme); }
+.toggle input:checked + .slider::before { transform: translateX(20px); }
+.toggle-label { font-size: 14px; font-weight: 500; color: var(--text); }
+
+/* ===== Additional visitors ===== */
+.visitor-card {
+  background: rgba(255,255,255,.03); border: 1px solid var(--border); border-radius: 12px;
+  padding: 16px; margin-bottom: 12px; position: relative;
+}
+.visitor-card h4 { font-size: 13px; font-weight: 600; color: var(--theme); margin-bottom: 12px; }
+.remove-btn {
+  position: absolute; top: 10px; right: 10px; width: 28px; height: 28px;
+  background: none; border: none; color: var(--text-muted); font-size: 16px; cursor: pointer;
+  border-radius: 6px; display: flex; align-items: center; justify-content: center;
+  transition: all .2s;
+}
+.remove-btn:hover { background: rgba(224,0,0,.12); color: var(--danger); }
+.add-visitor-btn {
+  padding: 10px 20px; border: 1px dashed var(--theme); border-radius: 10px;
+  background: transparent; color: var(--theme); font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all .2s; width: 100%; font-family: inherit;
+}
+.add-visitor-btn:hover { background: rgba(36,157,121,.1); }
+
+/* ===== Loading ===== */
+.loading-overlay {
+  position: fixed; inset: 0; background: rgba(13,18,26,.7);
+  backdrop-filter: blur(4px); display: flex; align-items: center;
+  justify-content: center; z-index: 999; font-size: 15px; color: var(--text-heading);
+}
+.spinner {
+  width: 36px; height: 36px; border: 3px solid #35434a; border-top-color: var(--theme);
+  border-radius: 50%; animation: spin .7s linear infinite; margin-right: 14px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.hidden { display: none !important; }
+
+/* ===== Result ===== */
+.result-card { text-align: center; padding: 48px 28px; }
+.result-card .icon { font-size: 56px; margin-bottom: 16px; }
+.result-card h2 { font-size: 22px; border: none; justify-content: center; color: var(--success); padding: 0; margin-bottom: 8px; }
+.result-card h2::before { display: none; }
+.result-card p { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; }
+.result-card .back-btn {
+  padding: 12px 28px; border: none; border-radius: 10px;
+  background: var(--theme); color: #fff; font-size: 14px; font-weight: 600; cursor: pointer;
+  font-family: inherit; transition: all .2s;
+}
+.result-card .back-btn:hover { transform: translateY(-1px); filter: brightness(1.1); box-shadow: 0 4px 12px rgba(36,157,121,.35); }
+
+/* ===== Split card ===== */
+.split-card { display: flex; gap: 24px; align-items: flex-start; }
+.split-card .split-panel { flex: 1; min-width: 0; }
+.split-card .split-divider { width: 1px; background: linear-gradient(180deg, transparent, var(--border) 20%, var(--border) 80%, transparent); align-self: stretch; flex: 0 0 auto; }
+.split-card .form-group { min-width: 0; }
+.split-card .cascade-row .form-group { min-width: 0; flex: 1; }
+
+/* ===== Cascade ===== */
+.cascade-row { display: flex; gap: 8px; }
+.cascade-row select { flex: 1; }
+
+/* ===== Pending table ===== */
+.table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); }
+.pending-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.pending-table th {
+  background: rgba(255,255,255,.04); padding: 12px 10px; text-align: left; font-weight: 600;
+  color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: .5px;
+  border-bottom: 1px solid var(--border); white-space: nowrap;
+}
+.pending-table td { padding: 12px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.pending-table tr:last-child td { border-bottom: none; }
+.pending-table tr:hover td { background: rgba(255,255,255,.03); }
+.pending-table .actions { display: flex; gap: 6px; }
+.approve-btn, .reject-btn {
+  padding: 6px 14px; border: none; border-radius: 8px; font-size: 12px;
+  cursor: pointer; font-weight: 700; transition: all .15s; letter-spacing: .3px; font-family: inherit;
+}
+.approve-btn { background: rgba(20,137,34,.2); color: var(--success); }
+.approve-btn:hover { background: rgba(20,137,34,.35); transform: translateY(-1px); }
+.reject-btn { background: rgba(224,0,0,.15); color: var(--danger); }
+.reject-btn:hover { background: rgba(224,0,0,.3); transform: translateY(-1px); }
+.pending-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
+.pending-header h2 { margin-bottom: 0; }
+.reload-btn {
+  padding: 8px 16px; border: 1px solid var(--border); border-radius: 10px;
+  background: transparent; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit;
+  color: var(--text); transition: all .2s;
+}
+.reload-btn:hover { border-color: var(--theme); color: var(--theme); background: rgba(36,157,121,.1); }
+.empty-state { text-align: center; padding: 48px 20px; color: var(--text-muted); font-size: 14px; }
+
+/* ===== Animations ===== */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.card { animation: fadeIn .35s ease-out; }
+.card:nth-child(2) { animation-delay: .05s; }
+.card:nth-child(3) { animation-delay: .1s; }
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .container { padding: 16px; }
+  .card { padding: 20px; }
+  .form-row { gap: 8px; }
+  .form-group { min-width: 100%; }
+  .split-card { flex-direction: column; gap: 16px; }
+  .split-card .split-divider { display: none; }
+  .header-left h1 { font-size: 17px; }
+  .header-right { flex-wrap: wrap; justify-content: flex-end; }
+  .login-section { margin: 40px auto; padding: 36px 24px; }
+}
+</style>
+<meta name="description" content="親家市政廣場訪客服務：訪客登記、業主登入與申請確認。"><link rel="icon" href="./favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="./style.css"></head>
+<body><header class="site-header"><div class="site-head-inner"><a class="site-brand" href="./index.html"><span class="brand-mark" aria-hidden="true">親</span><span>親家市政廣場<span class="brand-sub">訪客服務</span></span></a><nav class="site-nav" aria-label="服務分頁"><a href="./index.html">訪客登記</a><a href="./owner.html" aria-current="page">業主管理</a></nav></div></header>
+<div class="container" id="app">
+  <!-- Login Section -->
+    <div id="loginSection" class="card login-section">
+      <div class="login-logo">🏢</div>
+      <h1>業主管理</h1>
+      <p class="subtitle">登入後管理訪客、派發通行證與審核申請。</p>
+      <div class="form-group">
+        <label for="username">帳號 <span class="req">*</span></label>
+        <input type="text" id="username" placeholder="請輸入帳號" autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label for="password">密碼 <span class="req">*</span></label>
+        <input type="password" id="password" placeholder="請輸入密碼" autocomplete="current-password">
+      </div>
+      <div id="loginError" class="error-msg hidden"></div>
+      <button id="loginBtn" class="login-btn">登入業主帳號</button><p class="login-note">請使用原訪客系統的帳號與密碼。</p>
+    </div>
+
+  <!-- Main Form Section (hidden until login) -->
+  <div id="formSection" class="hidden">
+    <div class="card" style="padding:20px 28px;">
+      <div class="header-bar">
+        <div class="header-left">
+          <h1>業主管理</h1>
+          <span class="building-badge">📍 親家市政廣場</span>
+        </div>
+        <div class="header-right">
+          <div class="user-badge">
+            <span class="user-avatar" id="userAvatar"></span>
+            <span id="userDisplay"></span>
+          </div>
+          <button class="logout-btn" id="logoutBtn">登出</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sections 1+2: Location + Host Info side by side -->
+    <div class="card">
+      <div class="split-card">
+        <div class="split-panel">
+          <h2>① 拜訪地點</h2>
+          <div class="cascade-row">
+            <div class="form-group">
+              <label>縣市 <span class="req">*</span></label>
+              <select id="citySelect"><option value="">請選擇縣市</option></select>
+            </div>
+            <div class="form-group">
+              <label>行政區 <span class="req">*</span></label>
+              <select id="districtSelect"><option value="">請先選擇縣市</option></select>
+            </div>
+          </div>
+          <div class="cascade-row">
+            <div class="form-group">
+              <label>大樓 <span class="req">*</span></label>
+              <select id="buildingSelect"><option value="">請先選擇行政區</option></select>
+            </div>
+            <div class="form-group">
+              <label>拜訪公司 <span class="req">*</span></label>
+              <select id="companySelect"><option value="">請先選擇大樓</option></select>
+            </div>
+          </div>
+        </div>
+        <div class="split-divider"></div>
+        <div class="split-panel">
+          <h2>② 拜訪對象（受訪人）</h2>
+          <div class="form-group">
+            <label>選擇受訪人</label>
+            <select id="hostSelect" disabled><option value="">請先選擇拜訪公司</option></select>
+          </div>
+          <div class="form-group">
+            <label>受訪人姓名</label>
+            <input type="text" id="hostName" placeholder="自動帶入" readonly>
+          </div>
+          <div class="form-group">
+            <label>受訪人 Email</label>
+            <input type="email" id="hostEmail" placeholder="自動帶入" readonly>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sections 3+4: Visit Time/Reason + Visitor Info side by side -->
+    <div class="card">
+      <div class="split-card">
+        <div class="split-panel">
+          <h2>③ 拜訪時間與事由</h2>
+          <div class="form-group">
+            <label>日期 <span class="req">*</span></label>
+            <input type="date" id="visitDate">
+          </div>
+          <div class="cascade-row">
+            <div class="form-group">
+              <label>開始時間 <span class="req">*</span></label>
+              <input type="time" id="startTime">
+            </div>
+            <div class="form-group">
+              <label>結束時間 <span class="req">*</span></label>
+              <input type="time" id="endTime">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>拜訪事由 <span class="req">*</span></label>
+            <textarea id="reason" placeholder="請輸入拜訪事由" maxlength="250"></textarea>
+          </div>
+        </div>
+        <div class="split-divider"></div>
+        <div class="split-panel">
+          <h2>④ 訪客資料</h2>
+          <div class="form-group">
+            <label>訪客姓名 <span class="req">*</span></label>
+            <input type="text" id="visitorName" placeholder="請輸入姓名" maxlength="20">
+          </div>
+          <div class="form-group">
+            <label>公司名稱 <span class="req">*</span></label>
+            <input type="text" id="visitorCompany" placeholder="請輸入公司" maxlength="20">
+          </div>
+          <div class="cascade-row">
+            <div class="form-group">
+              <label>手機 <span class="req">*</span></label>
+              <input type="tel" id="visitorMobile" placeholder="請輸入手機號碼">
+            </div>
+            <div class="form-group">
+              <label>Email <span class="req">*</span></label>
+              <input type="email" id="visitorEmail" placeholder="請輸入 Email">
+            </div>
+          </div>
+          <div class="toggle-row">
+            <label class="toggle">
+              <input type="checkbox" id="toggleAdditional">
+              <span class="slider"></span>
+            </label>
+            <span class="toggle-label">有同行訪客</span>
+          </div>
+          <div id="additionalSection" class="hidden">
+            <div id="additionalList"></div>
+            <button id="addVisitorBtn" class="add-visitor-btn">＋ 新增同行訪客</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submit -->
+    <div class="card" style="text-align:center;">
+      <div id="formError" class="error-msg hidden"></div>
+      <p class="dispatch-note">送出後會核准此筆申請，並由原系統發送通行通知給訪客。</p><button id="submitBtn" class="submit-btn">派發通行證</button>
+    </div>
+
+    <!-- Section 5: Pending Review -->
+    <div class="card" id="pendingSection">
+      <div class="pending-header">
+        <h2 style="border:none;padding:0;margin:0;">待審核申請</h2>
+        <button id="reloadPendingBtn" class="reload-btn">重新整理</button>
+      </div>
+      <div id="pendingLoading" class="hidden" style="text-align:center;padding:12px;color:#718096;font-size:13px;">載入中...</div>
+      <div id="pendingContent"></div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div id="loadingOverlay" class="loading-overlay hidden">
+    <div class="spinner"></div>
+    <span id="loadingText">處理中...</span>
+  </div>
+
+  <!-- Success Result -->
+  <div id="resultSection" class="hidden">
+    <div class="card result-card">
+      <div class="icon">✅</div>
+      <h2>申請已送出</h2>
+      <p id="resultMsg">等待審核中，請稍候。</p>
+      <button class="back-btn" id="newAppBtn">填寫下一筆</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============== Constants ==============
+const API_BASE = 'https://vas-api.pss-group-prod.com/vas-pss/api/v1';
+
+// Taiwan cities & districts
+const CITIES = {
+  Taipei: '臺北市', NewTaipeiCity: '新北市', Taoyuan: '桃園市',
+  HsinchuCounty: '新竹縣', HsinchuCity: '新竹市',
+  Taichung: '臺中市', Tainan: '臺南市', Kaohsiung: '高雄市'
+};
+const DISTRICTS = {
+  NewTaipeiCity: ['Shimen','Sanzhi','Jinshan','Tamsui','Wanli','Xizhi','Ruifang','Gongliao','Pingxi','Shuangxi','Pinglin','Shiding','Xindian','Wulai','Yonghe','Zhonghe','Tucheng','Sanxia','Shulin','Yingge','Banqiao','Sanchong','Xinzhuang','Taishan','Luzhou','Linkou','Wugu','Shenkeng','Bali'],
+  Taipei: ['Beitou','Shilin','Neihu','Zhongshan','Datong','Songshan','Wenshan','Xinyi',"Da'an",'Zhongzheng','Wanhua','Nangang'],
+  Taoyuan: ['Xinwu','Guanyin','Dayuan','Luzhu','Guishan','Taoyuan','Zhongli','Yangmei','Pingzhen','Bade','Longtan','Fuxing','Daxi'],
+  HsinchuCounty: ['Xinfeng','Hukou','Zhubei','Xinpu','Guansi','Qionglin','Hengshan','Zhudong','Baoshan','Emei','Beipu','Wufeng','Jianshi'],
+  HsinchuCity: ['HsinchuCity'],
+  Taichung: ['Central','East','South','West','North','Beitun','Xitun','Nantun','Taiping','Dali','Wufeng','Wuri','Fengyuan','Houli','Shigang','Dongshi','Xinshe','Tanzi','Daya','Shengang','Dadu','Shalu','Longjing','Wuchi','Qingshui','Dajia','Waipu','Daan'],
+  Tainan: ['East','North','South','Central and Western','Anping','Annanz','Yongkang','Guiren','Xinhua','Zuoquan','Yujing','Nanshi','Nanhua','Rende','Guanmiao','Longqi','Guantian','Madou','Jiali','Xigang','Qigu','Jiangjun','Xuejia','Beimen','Xinying','Houbih','Baihe','Dongshan','Liujia','Xiyaying','Liuqing','Yanshui','Shanhua','Danei','Shanshang','Xinshi','Anding'],
+  Kaohsiung: ['Xinxing','Qianjin','Lingya','Yancheng','Gushan','Cijin','Qianzhen','Sanmin','Nanzih','Xiaogang','Zuoying','Renwu','Dashu','Gangshan','Luzhu','Alian','Tianliao','Yanchao','Qiaotou','Ziguan','Mizhou','Yongan','Hunei','Fengshan','Daliao','Linyuan','Niaosong','Dashi','Qishan','Meinong','Liugui','Neimen','Shanlin','Jiaxian','Taoyuan','Namasha','Maolin','Qieding']
+};
+const DISTRICT_LABELS = {
+  "Da'an":"大安","Zhongzheng":"中正","Xinyi":"信義","Songshan":"松山","Wenshan":"文山","Nangang":"南港","Wanhua":"萬華","Datong":"大同","Zhongshan":"中山","Shilin":"士林","Beitou":"北投","Neihu":"內湖",
+  "Banqiao":"板橋","Xinzhuang":"新莊","Zhonghe":"中和","Yonghe":"永和","Xindian":"新店","Tucheng":"土城","Sanchong":"三重","Shulin":"樹林","Xizhi":"汐止","Tamsui":"淡水","Linkou":"林口","Luzhou":"蘆洲","Taishan":"泰山","Yingge":"鶯歌","Sanxia":"三峽","Ruifang":"瑞芳","Bali":"八里","Shenkeng":"深坑","Wugu":"五股","Pinglin":"坪林","Shiding":"石碇","Wanli":"萬里","Jinshan":"金山","Gongliao":"貢寮","Shuangxi":"雙溪","Pingxi":"平溪","Wulai":"烏來","Sanzhi":"三芝","Shimen":"石門",
+  "Taoyuan":"桃園","Zhongli":"中壢","Guishan":"龜山","Dayuan":"大園","Luzhu":"蘆竹","Bade":"八德","Pingzhen":"平鎮","Yangmei":"楊梅","Longtan":"龍潭","Daxi":"大溪","Guanyin":"觀音","Xinwu":"新屋","Fuxing":"復興",
+  "Zhubei":"竹北","Zhudong":"竹東","Hukou":"湖口","Xinfeng":"新豐","Xinpu":"新埔","Guansi":"關西","Qionglin":"芎林","Baoshan":"寶山","Beipu":"北埔","Emei":"峨眉","Wufeng":"五峰","Hengshan":"橫山","Jianshi":"尖石",
+  "HsinchuCity":"新竹市",
+  "North":"北區","South":"南區","East":"東區","West":"西區","Central":"中區","Beitun":"北屯","Xitun":"西屯","Nantun":"南屯","Taiping":"太平","Dali":"大里","Wufeng":"霧峰","Wuri":"烏日","Fengyuan":"豐原","Houli":"后里","Shigang":"石岡","Dongshi":"東勢","Xinshe":"新社","Tanzi":"潭子","Daya":"大雅","Shengang":"神岡","Dadu":"大肚","Shalu":"沙鹿","Longjing":"龍井","Wuchi":"梧棲","Qingshui":"清水","Dajia":"大甲","Waipu":"外埔","Daan":"大安",
+  "Yongkang":"永康","Guiren":"歸仁","Xinhua":"新化","Zuoquan":"左鎮","Yujing":"玉井","Nanshi":"南化","Nanhua":"南化","Rende":"仁德","Guanmiao":"關廟","Longqi":"龍崎","Guantian":"官田","Madou":"麻豆","Jiali":"佳里","Xigang":"西港","Qigu":"七股","Jiangjun":"將軍","Xuejia":"學甲","Beimen":"北門","Xinying":"新營","Houbih":"後壁","Baihe":"白河","Dongshan":"東山","Liujia":"柳營","Xiyaying":"西甲","Liuqing":"六甲","Yanshui":"鹽水","Shanhua":"善化","Danei":"大內","Shanshang":"山上","Xinshi":"新市","Anding":"安定","Anping":"安平","Annanz":"安南",
+  "Xinxing":"新興","Qianjin":"前金","Lingya":"苓雅","Yancheng":"鹽埕","Gushan":"鼓山","Cijin":"旗津","Qianzhen":"前鎮","Sanmin":"三民","Nanzih":"楠梓","Xiaogang":"小港","Zuoying":"左營","Renwu":"仁武","Dashu":"大樹","Gangshan":"岡山","Alian":"阿蓮","Tianliao":"田寮","Yanchao":"燕巢","Qiaotou":"橋頭","Ziguan":"梓官","Mizhou":"彌陀","Yongan":"永安","Hunei":"湖內","Fengshan":"鳳山","Daliao":"大寮","Linyuan":"林園","Niaosong":"鳥松","Dashi":"大社","Qishan":"旗山","Meinong":"美濃","Liugui":"六龜","Neimen":"內門","Shanlin":"杉林","Jiaxian":"甲仙","Taoyuan":"桃源","Namasha":"那瑪夏","Maolin":"茂林","Qieding":"茄萣",
+  "Central and Western":"中西區"
+};
+const DISTRICT_KEYS = {
+  "Central and Western": "Central and Western"
+};
+// Postal code lookup (city/district mapping)
+const POSTAL_MAP = {
+  100:{city:"Taipei",district:"Zhongzheng"},103:{city:"Taipei",district:"Datong"},104:{city:"Taipei",district:"Zhongshan"},105:{city:"Taipei",district:"Songshan"},106:{city:"Taipei",district:"Da'an"},108:{city:"Taipei",district:"Wanhua"},110:{city:"Taipei",district:"Xinyi"},111:{city:"Taipei",district:"Shilin"},112:{city:"Taipei",district:"Beitou"},114:{city:"Taipei",district:"Neihu"},115:{city:"Taipei",district:"Nangang"},116:{city:"Taipei",district:"Wenshan"},
+  207:{city:"NewTaipeiCity",district:"Wanli"},208:{city:"NewTaipeiCity",district:"Jinshan"},220:{city:"NewTaipeiCity",district:"Banqiao"},221:{city:"NewTaipeiCity",district:"Xizhi"},222:{city:"NewTaipeiCity",district:"Shenkeng"},223:{city:"NewTaipeiCity",district:"Shiding"},224:{city:"NewTaipeiCity",district:"Ruifang"},226:{city:"NewTaipeiCity",district:"Pingxi"},227:{city:"NewTaipeiCity",district:"Shuangxi"},228:{city:"NewTaipeiCity",district:"Gongliao"},231:{city:"NewTaipeiCity",district:"Xindian"},232:{city:"NewTaipeiCity",district:"Pinglin"},233:{city:"NewTaipeiCity",district:"Wulai"},234:{city:"NewTaipeiCity",district:"Yonghe"},235:{city:"NewTaipeiCity",district:"Zhonghe"},236:{city:"NewTaipeiCity",district:"Tucheng"},237:{city:"NewTaipeiCity",district:"Sanxia"},238:{city:"NewTaipeiCity",district:"Shulin"},239:{city:"NewTaipeiCity",district:"Yingge"},241:{city:"NewTaipeiCity",district:"Sanchong"},242:{city:"NewTaipeiCity",district:"Xinzhuang"},243:{city:"NewTaipeiCity",district:"Taishan"},244:{city:"NewTaipeiCity",district:"Linkou"},247:{city:"NewTaipeiCity",district:"Luzhou"},248:{city:"NewTaipeiCity",district:"Wugu"},249:{city:"NewTaipeiCity",district:"Bali"},251:{city:"NewTaipeiCity",district:"Tamsui"},252:{city:"NewTaipeiCity",district:"Sanzhi"},253:{city:"NewTaipeiCity",district:"Shimen"},
+  300:{city:"HsinchuCity",district:"HsinchuCity"},
+  302:{city:"HsinchuCounty",district:"Zhubei"},303:{city:"HsinchuCounty",district:"Hukou"},304:{city:"HsinchuCounty",district:"Xinfeng"},305:{city:"HsinchuCounty",district:"Xinpu"},306:{city:"HsinchuCounty",district:"Guansi"},307:{city:"HsinchuCounty",district:"Qionglin"},308:{city:"HsinchuCounty",district:"Baoshan"},310:{city:"HsinchuCounty",district:"Zhudong"},311:{city:"HsinchuCounty",district:"Wufeng"},312:{city:"HsinchuCounty",district:"Hengshan"},313:{city:"HsinchuCounty",district:"Jianshi"},314:{city:"HsinchuCounty",district:"Beipu"},315:{city:"HsinchuCounty",district:"Emei"},
+  320:{city:"Taoyuan",district:"Zhongli"},324:{city:"Taoyuan",district:"Pingzhen"},325:{city:"Taoyuan",district:"Longtan"},326:{city:"Taoyuan",district:"Yangmei"},327:{city:"Taoyuan",district:"Xinwu"},328:{city:"Taoyuan",district:"Guanyin"},330:{city:"Taoyuan",district:"Taoyuan"},333:{city:"Taoyuan",district:"Guishan"},334:{city:"Taoyuan",district:"Bade"},335:{city:"Taoyuan",district:"Daxi"},336:{city:"Taoyuan",district:"Fuxing"},337:{city:"Taoyuan",district:"Dayuan"},338:{city:"Taoyuan",district:"Luzhu"},
+  400:{city:"Taichung",district:"Central"},401:{city:"Taichung",district:"East"},402:{city:"Taichung",district:"South"},403:{city:"Taichung",district:"West"},404:{city:"Taichung",district:"North"},406:{city:"Taichung",district:"Beitun"},407:{city:"Taichung",district:"Xitun"},408:{city:"Taichung",district:"Nantun"},411:{city:"Taichung",district:"Taiping"},412:{city:"Taichung",district:"Dali"},413:{city:"Taichung",district:"Wufeng"},414:{city:"Taichung",district:"Wuri"},420:{city:"Taichung",district:"Fengyuan"},421:{city:"Taichung",district:"Houli"},422:{city:"Taichung",district:"Shigang"},423:{city:"Taichung",district:"Dongshi"},426:{city:"Taichung",district:"Xinshe"},427:{city:"Taichung",district:"Tanzi"},428:{city:"Taichung",district:"Daya"},429:{city:"Taichung",district:"Shengang"},432:{city:"Taichung",district:"Dadu"},433:{city:"Taichung",district:"Shalu"},434:{city:"Taichung",district:"Longjing"},435:{city:"Taichung",district:"Wuchi"},436:{city:"Taichung",district:"Qingshui"},437:{city:"Taichung",district:"Dajia"},438:{city:"Taichung",district:"Waipu"},439:{city:"Taichung",district:"Daan"},
+  700:{city:"Tainan",district:"Central and Western"},701:{city:"Tainan",district:"East"},702:{city:"Tainan",district:"South"},704:{city:"Tainan",district:"North"},708:{city:"Tainan",district:"Anping"},709:{city:"Tainan",district:"Annanz"},710:{city:"Tainan",district:"Yongkang"},711:{city:"Tainan",district:"Guiren"},712:{city:"Tainan",district:"Xinhua"},713:{city:"Tainan",district:"Zuoquan"},714:{city:"Tainan",district:"Yujing"},715:{city:"Tainan",district:"Nanshi"},716:{city:"Tainan",district:"Nanhua"},717:{city:"Tainan",district:"Rende"},718:{city:"Tainan",district:"Guanmiao"},719:{city:"Tainan",district:"Longqi"},720:{city:"Tainan",district:"Guantian"},721:{city:"Tainan",district:"Madou"},722:{city:"Tainan",district:"Jiali"},723:{city:"Tainan",district:"Xigang"},724:{city:"Tainan",district:"Qigu"},725:{city:"Tainan",district:"Jiangjun"},726:{city:"Tainan",district:"Xuejia"},727:{city:"Tainan",district:"Beimen"},730:{city:"Tainan",district:"Xinying"},731:{city:"Tainan",district:"Houbih"},732:{city:"Tainan",district:"Baihe"},733:{city:"Tainan",district:"Dongshan"},734:{city:"Tainan",district:"Liujia"},735:{city:"Tainan",district:"Xiyaying"},736:{city:"Tainan",district:"Liuqing"},737:{city:"Tainan",district:"Yanshui"},741:{city:"Tainan",district:"Shanhua"},742:{city:"Tainan",district:"Danei"},743:{city:"Tainan",district:"Shanshang"},744:{city:"Tainan",district:"Xinshi"},745:{city:"Tainan",district:"Anding"},
+  800:{city:"Kaohsiung",district:"Xinxing"},801:{city:"Kaohsiung",district:"Qianjin"},802:{city:"Kaohsiung",district:"Lingya"},803:{city:"Kaohsiung",district:"Yancheng"},804:{city:"Kaohsiung",district:"Gushan"},805:{city:"Kaohsiung",district:"Cijin"},806:{city:"Kaohsiung",district:"Qianzhen"},807:{city:"Kaohsiung",district:"Sanmin"},811:{city:"Kaohsiung",district:"Nanzih"},812:{city:"Kaohsiung",district:"Xiaogang"},813:{city:"Kaohsiung",district:"Zuoying"},814:{city:"Kaohsiung",district:"Renwu"},815:{city:"Kaohsiung",district:"Dashu"},820:{city:"Kaohsiung",district:"Gangshan"},821:{city:"Kaohsiung",district:"Luzhu"},822:{city:"Kaohsiung",district:"Alian"},823:{city:"Kaohsiung",district:"Tianliao"},824:{city:"Kaohsiung",district:"Yanchao"},825:{city:"Kaohsiung",district:"Qiaotou"},826:{city:"Kaohsiung",district:"Ziguan"},827:{city:"Kaohsiung",district:"Mizhou"},828:{city:"Kaohsiung",district:"Yongan"},829:{city:"Kaohsiung",district:"Hunei"},830:{city:"Kaohsiung",district:"Fengshan"},831:{city:"Kaohsiung",district:"Daliao"},832:{city:"Kaohsiung",district:"Linyuan"},833:{city:"Kaohsiung",district:"Niaosong"},840:{city:"Kaohsiung",district:"Dashi"},842:{city:"Kaohsiung",district:"Qishan"},843:{city:"Kaohsiung",district:"Meinong"},844:{city:"Kaohsiung",district:"Liugui"},845:{city:"Kaohsiung",district:"Neimen"},846:{city:"Kaohsiung",district:"Shanlin"},847:{city:"Kaohsiung",district:"Jiaxian"},848:{city:"Kaohsiung",district:"Taoyuan"},849:{city:"Kaohsiung",district:"Namasha"},851:{city:"Kaohsiung",district:"Maolin"},852:{city:"Kaohsiung",district:"Qieding"}
+};
+
+// District labels mapping for display
+const DISTRICT_DISPLAY = {};
+for (const [city, dists] of Object.entries(DISTRICTS)) {
+  for (const d of dists) {
+    DISTRICT_DISPLAY[d] = DISTRICT_LABELS[d] || d;
+  }
+}
+
+// ============== Default Location ==============
+const DEFAULTS = {
+  city: 'Taichung',
+  district: 'Xitun',
+  buildingName: '親家市政廣場'
+};
+
+// ============== State ==============
+let guestToken = null;
+let authToken = null;
+let authUser = null;
+let buildings = [];
+let companies = [];
+let reviewers = [];
+let additionalVisitors = [];
+let isSubmitting = false;
+let pendingCompanyEid = null;
+
+// ============== DOM refs ==============
+const $ = id => document.getElementById(id);
+const loginSection = $('loginSection');
+const formSection = $('formSection');
+const resultSection = $('resultSection');
+const loadingOverlay = $('loadingOverlay');
+const loadingText = $('loadingText');
+
+// ============== helpers ==============
+function showLoading(msg = '處理中...') {
+  loadingText.textContent = msg;
+  loadingOverlay.classList.remove('hidden');
+}
+function hideLoading() { loadingOverlay.classList.add('hidden'); }
+function showError(el, msg) { el.textContent = msg; el.classList.remove('hidden'); }
+function hideError(el) { el.classList.add('hidden'); }
+
+function pad2(n) { return String(n).padStart(2, '0'); }
+
+// ============== API helpers ==============
+async function apiFetch(path, options = {}) {
+  const url = `${API_BASE}/${path}`;
+  const res = await fetch(url, {
+    signal: AbortSignal.timeout(25000),
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(options.headers || {})
+    }
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.ReturnMsg || `HTTP ${res.status}`);
+  if (data.ReturnCode !== undefined && String(data.ReturnCode) !== '0') throw new Error(data.ReturnMsg || '系統未完成要求，請稍後重試');
+  return data;
+}
+
+// ============== Login ==============
+async function handleLogin() {
+  const username = $('username').value.trim();
+  const password = $('password').value.trim();
+  const errEl = $('loginError');
+  hideError(errEl);
+  if (!username || !password) { showError(errEl, '請輸入帳號與密碼'); return; }
+  showLoading('登入中...');
+  try {
+    const data = await apiFetch('vas/company-staff/login', {
+      method: 'POST',
+      body: JSON.stringify({ username, password })
+    });
+    if (data.ReturnCode !== '0') { showError(errEl, data.ReturnMsg || '登入失敗'); hideLoading(); return; }
+    authToken = data.Data.token;
+    authUser = {
+      username,
+      displayName: data.Data.display_name,
+      enterpriseIds: Array.isArray(data.Data.enterprise_ids) ? data.Data.enterprise_ids : [data.Data.enterprise_ids],
+      buildingNo: data.Data.building_no
+    };
+    hideLoading();
+    // Get guest token
+    await initGuestToken();
+    await enterForm();
+  } catch (e) {
+    hideLoading();
+    showError(errEl, '登入失敗：' + e.message);
+  }
+}
+
+async function initGuestToken() {
+  try {
+    const data = await apiFetch('vas/guest');
+    if (data.ReturnCode === '0' && data.AccessToken) {
+      guestToken = data.AccessToken;
+    }
+  } catch (e) {
+    console.warn('Failed to get guest token, will retry before submit', e);
+  }
+}
+
+async function enterForm() {
+  loginSection.classList.add('hidden');
+  formSection.classList.remove('hidden');
+  const name = authUser.displayName || authUser.username;
+  $('userDisplay').textContent = name;
+  $('userAvatar').textContent = name.charAt(0).toUpperCase();
+  $('password').value = '';
+  await initForm();
+  initializeManagement();
+  loadPendingApplications();
+}
+
+function handleLogout() {
+  authToken = null;
+  authUser = null;
+  guestToken = null;
+  resetManagement();
+  formSection.classList.add('hidden');
+  resultSection.classList.add('hidden');
+  loginSection.classList.remove('hidden');
+  $('username').value = '';
+  $('password').value = '';
+}
+
+// ============== Form Initialization ==============
+async function initForm() {
+  // Set default date/time
+  const now = new Date();
+  $('visitDate').value = `${now.getFullYear()}-${pad2(now.getMonth()+1)}-${pad2(now.getDate())}`;
+  $('startTime').value = `${pad2(Math.min(now.getHours() + 1, 22))}:${pad2(0)}`;
+  $('endTime').value = `${pad2(Math.min(now.getHours() + 2, 23))}:${pad2(0)}`;
+  // Default values
+  $('reason').value = '洽公';
+  $('visitorCompany').value = '';
+  $('visitorEmail').value = '';
+
+  // Populate cities
+  const citySel = $('citySelect');
+  citySel.innerHTML = '<option value="">請選擇縣市</option>';
+  for (const [key, label] of Object.entries(CITIES)) {
+    citySel.innerHTML += `<option value="${key}">${label}</option>`;
+  }
+
+  // Load buildings then set defaults
+  await loadBuildings();
+  setDefaultLocation();
+}
+
+function setDefaultLocation() {
+  pendingCompanyEid = authUser?.enterpriseIds?.[0] || null;
+  // Set city to default
+  $('citySelect').value = DEFAULTS.city;
+  $('citySelect').dispatchEvent(new Event('change'));
+
+  // Set district to default
+  $('districtSelect').value = DEFAULTS.district;
+  $('districtSelect').dispatchEvent(new Event('change'));
+
+  // Find and select the default building by name (or by authUser.buildingNo)
+  const bldNo = authUser?.buildingNo;
+  const bld = bldNo ? buildings.find(b => b.BuildingNo === bldNo) : buildings.find(b => b.BuildingName.includes(DEFAULTS.buildingName));
+  if (bld) {
+    $('buildingSelect').value = bld.BuildingNo;
+    $('buildingSelect').dispatchEvent(new Event('change'));
+  }
+  // Set pending company from logged-in account's enterprise_ids
+  if (authUser?.enterpriseIds?.length) {
+    pendingCompanyEid = authUser.enterpriseIds[0];
+  }
+}
+
+async function loadBuildings() {
+  if (!guestToken) await initGuestToken();
+  if (!guestToken) return;
+  try {
+    const data = await apiFetch('vas/building-data/get_all', {
+      method: 'POST',
+      body: JSON.stringify({ username: 'admin' }),
+      headers: { Authorization: `Bearer ${guestToken}` }
+    });
+    if (data.ReturnCode === '0' && data.DataList) {
+      buildings = data.DataList;
+    }
+  } catch (e) {
+    console.error('loadBuildings error', e);
+  }
+}
+
+// ============== Cascade Selectors ==============
+$('citySelect').addEventListener('change', function() {
+  const city = this.value;
+  const distSel = $('districtSelect');
+  distSel.innerHTML = '<option value="">請選擇行政區</option>';
+  $('buildingSelect').innerHTML = '<option value="">請先選擇行政區</option>';
+  $('companySelect').innerHTML = '<option value="">請先選擇大樓</option>';
+  $('hostSelect').innerHTML = '<option value="">請先選擇拜訪公司</option>';
+  $('hostSelect').disabled = true;
+  reviewers = [];
+  $('hostName').value = '';
+  $('hostEmail').value = '';
+  if (!city) return;
+  const dists = DISTRICTS[city] || [];
+  for (const d of dists) {
+    distSel.innerHTML += `<option value="${d}">${DISTRICT_DISPLAY[d] || d}</option>`;
+  }
+});
+
+$('districtSelect').addEventListener('change', function() {
+  const city = $('citySelect').value;
+  const district = this.value;
+  const bldSel = $('buildingSelect');
+  bldSel.innerHTML = '<option value="">請選擇大樓</option>';
+  $('companySelect').innerHTML = '<option value="">請先選擇大樓</option>';
+  $('hostSelect').innerHTML = '<option value="">請先選擇拜訪公司</option>';
+  $('hostSelect').disabled = true;
+  reviewers = [];
+  $('hostName').value = '';
+  $('hostEmail').value = '';
+  if (!city || !district || !buildings.length) return;
+  let postalPrefix = null;
+  for (const [code, info] of Object.entries(POSTAL_MAP)) {
+    if (info.city === city && info.district === district) {
+      postalPrefix = String(code);
+      break;
+    }
+  }
+  if (!postalPrefix) return;
+  const matched = buildings.filter(b => b.PostalCode && b.PostalCode.startsWith(postalPrefix));
+  for (const b of matched) {
+    bldSel.innerHTML += `<option value="${b.BuildingNo}">${b.BuildingName} 📍${b.Address}</option>`;
+  }
+});
+
+$('buildingSelect').addEventListener('change', async function() {
+  const bldNo = this.value;
+  const compSel = $('companySelect');
+  compSel.innerHTML = '<option value="">載入中...</option>';
+  companies = [];
+  $('hostSelect').innerHTML = '<option value="">請先選擇拜訪公司</option>';
+  $('hostSelect').disabled = true;
+  reviewers = [];
+  $('hostName').value = '';
+  $('hostEmail').value = '';
+  if (!bldNo || !guestToken) {
+    compSel.innerHTML = '<option value="">請先選擇大樓</option>';
+    return;
+  }
+  try {
+    const data = await apiFetch('vas/enterprise-data/query', {
+      method: 'POST',
+      body: JSON.stringify({ BuildingNo: bldNo }),
+      headers: { Authorization: `Bearer ${guestToken}` }
+    });
+    if (data.ReturnCode === '0' && data.DataList) {
+      companies = data.DataList.filter(c => c.EnterpriseId !== '00000000');
+      compSel.innerHTML = '<option value="">請選擇公司</option>';
+      for (const c of companies) {
+        const label = c.EnterpriseChName + (c.EnterpriseEnName ? ` (${c.EnterpriseEnName})` : '');
+        compSel.innerHTML += `<option value="${c.EnterpriseId}">${label}</option>`;
+      }
+      // Auto-select pending company (from logged-in account's enterprise_ids)
+      if (pendingCompanyEid && companies.some(c => c.EnterpriseId === pendingCompanyEid)) {
+        compSel.value = pendingCompanyEid;
+        pendingCompanyEid = null;
+        compSel.dispatchEvent(new Event('change'));
+      }
+    } else {
+      compSel.innerHTML = '<option value="">查無公司資料</option>';
+    }
+  } catch (e) {
+    console.error('loadCompanies error', e);
+    compSel.innerHTML = '<option value="">載入失敗</option>';
+  }
+});
+
+$('companySelect').addEventListener('change', async function() {
+  const eid = this.value;
+  const bldNo = $('buildingSelect').value;
+  const hostSel = $('hostSelect');
+  hostSel.innerHTML = '<option value="">載入中...</option>';
+  hostSel.disabled = true;
+  $('hostName').value = '';
+  $('hostEmail').value = '';
+  reviewers = [];
+  if (!eid || !bldNo || !guestToken) { hostSel.innerHTML = '<option value="">請先選擇拜訪公司</option>'; return; }
+  try {
+    const data = await apiFetch('vas/company-staff/query', {
+      method: 'POST',
+      body: JSON.stringify({ BuildingNo: bldNo, EnterpriseId: eid }),
+      headers: { Authorization: `Bearer ${guestToken}` }
+    });
+    reviewers = (data.DataList || []).filter(r => r.EnterpriseId === eid);
+    if (reviewers.length === 0) {
+      hostSel.innerHTML = '<option value="">查無受訪人</option>';
+      return;
+    }
+    hostSel.innerHTML = '<option value="">請選擇受訪人</option>';
+    for (let i = 0; i < reviewers.length; i++) {
+      hostSel.innerHTML += `<option value="${i}">${reviewers[i].display_name} (${reviewers[i].username})</option>`;
+    }
+    hostSel.disabled = false;
+    hostSel.value = '0';
+    hostSel.dispatchEvent(new Event('change'));
+  } catch (e) { hostSel.innerHTML = '<option value="">載入失敗</option>'; }
+});
+
+$('hostSelect').addEventListener('change', function() {
+  const idx = parseInt(this.value, 10);
+  if (isNaN(idx) || !reviewers[idx]) {
+    $('hostName').value = '';
+    $('hostEmail').value = '';
+    return;
+  }
+  $('hostName').value = $('companySelect').selectedOptions[0]?.textContent.trim() || reviewers[idx].display_name;
+  $('hostEmail').value = reviewers[idx].username;
+});
+
+// ============== Additional Visitors ==============
+$('toggleAdditional').addEventListener('change', function() {
+  $('additionalSection').classList.toggle('hidden', !this.checked);
+});
+
+$('addVisitorBtn').addEventListener('click', function() {
+  addVisitorCard();
+});
+
+function addVisitorCard(data = {}) {
+  const idx = additionalVisitors.length;
+  const div = document.createElement('div');
+  div.className = 'visitor-card';
+  div.dataset.index = idx;
+  div.innerHTML = `
+    <button class="remove-btn" data-index="${idx}">✕</button>
+    <h4>同行訪客 #${idx + 1}</h4>
+    <div class="form-row">
+      <div class="form-group">
+        <label>姓名 <span class="req">*</span></label>
+        <input type="text" class="av-name" placeholder="請輸入姓名" maxlength="20" value="${escHtml(data.VisitorName || '')}">
+      </div>
+      <div class="form-group">
+        <label>公司</label>
+        <input type="text" class="av-company" placeholder="請輸入公司" maxlength="20" value="${escHtml(data.VisitorCompany || '')}">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>手機 <span class="req">*</span></label>
+        <input type="tel" class="av-mobile" placeholder="請輸入手機" value="${escHtml(data.VisitorPhone || '')}">
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" class="av-email" placeholder="請輸入 Email" value="${escHtml(data.VisitorEmail || '')}">
+      </div>
+    </div>
+  `;
+  div.querySelector('.remove-btn').addEventListener('click', function() {
+    div.remove();
+    additionalVisitors.splice(idx, 1);
+    reindexVisitors();
+  });
+  $('additionalList').appendChild(div);
+  additionalVisitors.push({ index: idx, el: div });
+}
+
+function reindexVisitors() {
+  const cards = $('additionalList').querySelectorAll('.visitor-card');
+  additionalVisitors = [];
+  cards.forEach((card, i) => {
+    card.querySelector('h4').textContent = `同行訪客 #${i + 1}`;
+    card.querySelector('.remove-btn').dataset.index = i;
+    additionalVisitors.push({ index: i, el: card });
+  });
+}
+
+function collectAdditionalVisitors() {
+  const result = [];
+  additionalVisitors.forEach(av => {
+    const el = av.el;
+    const name = el.querySelector('.av-name').value.trim();
+    if (!name) return;
+    result.push({
+      VisitorName: name,
+      VisitorCompany: el.querySelector('.av-company').value.trim(),
+      VisitorPhone: el.querySelector('.av-mobile').value.trim(),
+      VisitorEmail: el.querySelector('.av-email').value.trim()
+    });
+  });
+  return result;
+}
+
+// ============== Submit ==============
+$('submitBtn').addEventListener('click', handleSubmit);
+
+async function handleSubmit() {
+  if (isSubmitting) return;
+  const errEl = $('formError');
+  hideError(errEl);
+
+  // Validate
+  const hostName = $('hostName').value.trim();
+  const hostEmail = $('hostEmail').value.trim();
+  const city = $('citySelect').value;
+  const district = $('districtSelect').value;
+  const buildingNo = $('buildingSelect').value;
+  const companyId = $('companySelect').value;
+  const visitDate = $('visitDate').value;
+  const startTime = $('startTime').value;
+  const endTime = $('endTime').value;
+  const reason = $('reason').value.trim();
+  const vName = $('visitorName').value.trim();
+  const vCompany = $('visitorCompany').value.trim();
+  const vMobile = $('visitorMobile').value.trim();
+  const vEmail = $('visitorEmail').value.trim();
+
+  if (!hostName) { showError(errEl, '請填寫受訪人姓名'); return; }
+  if (!hostEmail) { showError(errEl, '請填寫受訪人 Email'); return; }
+  if (!buildingNo) { showError(errEl, '請選擇大樓'); return; }
+  if (!companyId) { showError(errEl, '請選擇拜訪公司'); return; }
+  if (!visitDate) { showError(errEl, '請選擇日期'); return; }
+  if (!startTime) { showError(errEl, '請選擇開始時間'); return; }
+  if (!endTime) { showError(errEl, '請選擇結束時間'); return; }
+  if (endTime <= startTime) { showError(errEl, '結束時間必須晚於開始時間'); return; }
+  if (!reason) { showError(errEl, '請填寫拜訪事由'); return; }
+  if (!vName) { showError(errEl, '請填寫訪客姓名'); return; }
+  if (!vCompany) { showError(errEl, '請填寫訪客公司'); return; }
+  if (!vMobile) { showError(errEl, '請填寫訪客手機'); return; }
+  if (!vEmail) { showError(errEl, '請填寫訪客 Email'); return; }
+
+  // Basic email validation
+  const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRe.test(hostEmail)) { showError(errEl, '受訪人 Email 格式不正確'); return; }
+  if (!emailRe.test(vEmail)) { showError(errEl, '訪客 Email 格式不正確'); return; }
+
+  // Get guest token if not already
+  if (!guestToken) {
+    await initGuestToken();
+    if (!guestToken) { showError(errEl, '無法取得訪客權限，請重新登入'); return; }
+  }
+
+  isSubmitting = true;
+  showLoading('驗證受訪人資訊...');
+
+  try {
+    // Verify host exists as reviewer
+    const qryData = await apiFetch('vas/company-staff/query', {
+      method: 'POST',
+      body: JSON.stringify({ BuildingNo: buildingNo, EnterpriseId: companyId }),
+      headers: { Authorization: `Bearer ${guestToken}` }
+    });
+
+    const reviewerList = qryData.DataList || [];
+    const hostFound = reviewerList.some(r => r.username === hostEmail);
+    if (!hostFound) {
+      hideLoading(); isSubmitting = false;
+      showError(errEl, '找不到該受訪人，請確認 Email 是否正確');
+      return;
+    }
+
+    showLoading('送出申請中...');
+
+    // Build visitor list
+    const visitors = [{
+      VisitorNo: 1,
+      VisitorName: vName,
+      VisitorCompany: vCompany,
+      VisitorPhone: vMobile,
+      VisitorEmail: vEmail
+    }];
+
+    if ($('toggleAdditional').checked) {
+      const addVisitors = collectAdditionalVisitors();
+      addVisitors.forEach((v, i) => {
+        visitors.push({
+          VisitorNo: visitors.length + 1,
+          VisitorName: v.VisitorName,
+          VisitorCompany: v.VisitorCompany || vCompany,
+          VisitorPhone: v.VisitorPhone,
+          VisitorEmail: v.VisitorEmail
+        });
+      });
+    }
+
+    // Format dates
+    const dateObj = new Date(visitDate + 'T' + startTime + ':00');
+    const endDateObj = new Date(visitDate + 'T' + endTime + ':00');
+    const fmtDate = (d) =>
+      `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}:00`;
+
+    const applyNo = String(Date.now());
+
+    const body = {
+      ApplyNo: applyNo,
+      BuildingNo: buildingNo,
+      EnterpriseId: companyId,
+      EmpName: hostName,
+      EmpEmail: hostEmail,
+      VisitorCompany: vCompany,
+      VisitorCount: visitors.length,
+      VisitorStartTime: fmtDate(dateObj),
+      VisitorEndTime: fmtDate(endDateObj),
+      VisitorReason: reason,
+      VisitorStatus: 'A',
+      VisitorList: visitors
+    };
+
+    const result = await apiFetch('vas/visitor-application', {
+      method: 'POST',
+      body: JSON.stringify(body),
+      headers: { Authorization: `Bearer ${guestToken}` }
+    });
+
+    if (result.ReturnCode !== '0') {
+      hideLoading(); isSubmitting = false;
+      showError(errEl, result.ReturnMsg || '送出失敗');
+      return;
+    }
+
+    // Auto-approve to trigger SMS/Email ticket delivery
+    // (matches backstage "Get Tickets" flow: create with 'A', then approve with ApplyStatus 'Y')
+    showLoading('核准並發送票券中...');
+    let approveOk = false;
+    try {
+      const approveRes = await apiFetch('vas/visitor-application/approve', {
+        method: 'POST',
+        body: JSON.stringify({
+          BuildingNo: buildingNo,
+          EnterpriseId: companyId,
+          ApproveUser: authUser.username,
+          VisitorApplicationList: [{ ApplyNo: applyNo, ApplyStatus: 'Y' }]
+        }),
+        headers: { Authorization: `Bearer ${authToken}` }
+      });
+      approveOk = approveRes.ReturnCode === '0';
+    } catch (e) {
+      approveOk = false;
+      console.error('Auto-approve error', e);
+    }
+
+    hideLoading(); isSubmitting = false;
+
+    if (approveOk) {
+      showResult(true, '申請已核准，票券簡訊／Email 已發送給訪客。');
+    } else {
+      showResult(true, '申請已送出，但核准通知發送失敗，請至待審核清單手動核准。');
+    }
+  } catch (e) {
+    hideLoading(); isSubmitting = false;
+    showError(errEl, '送出失敗：' + e.message);
+  }
+}
+
+// ============== Pending Review (Reviewer) ==============
+let pendingRequestVersion = 0;
+async function loadPendingApplications() {
+  if (!authUser) return;
+  const user = authUser, token = authToken, request = ++pendingRequestVersion;
+  const container = $('pendingContent'), loading = $('pendingLoading');
+  loading.classList.remove('hidden');
+  container.replaceChildren();
+  const allApps = [];
+  const seenApplications = new Set();
+  try {
+    if (!user.buildingNo) throw new Error('未設定管轄大樓');
+    const eids = user.enterpriseIds.map(String);
+    for (let i = 0; i < 30; i++) {
+      if (request !== pendingRequestVersion || authUser !== user) return;
+      loading.textContent = `正在查詢待審核申請（${i+1}/30 天）…`;
+      const d = new Date(); d.setDate(d.getDate() + i);
+      const date = `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+      const data = await apiFetch('vas/visitor-application/query', {
+        method: 'POST', body: JSON.stringify({BuildingNo:user.buildingNo,VisitDate:date}),
+        headers: {Authorization:`Bearer ${token}`}
+      });
+      if (request !== pendingRequestVersion || authUser !== user) return;
+      for (const app of (Array.isArray(data.DataList) ? data.DataList : [])) {
+        if (app.VisitorStatus === 'A' && eids.includes(String(app.EnterpriseId)) && !seenApplications.has(app.ApplyNo)) { allApps.push(app); seenApplications.add(app.ApplyNo); }
+      }
+      renderPendingApplications(allApps, false);
+    }
+    renderPendingApplications(allApps, true);
+  } catch (error) {
+    if (request !== pendingRequestVersion || authUser !== user) return;
+    renderPendingApplications(allApps, false);
+    const note = document.createElement('p');note.className='query-error';
+    note.textContent=`查詢尚未完成：${error.message}。請按重新整理重試。`;
+    container.prepend(note);
+  } finally {
+    if (request === pendingRequestVersion) loading.classList.add('hidden');
+  }
+}
+function renderPendingApplications(apps, complete = true) {
+  const container=$('pendingContent');container.replaceChildren();
+  if (!apps.length) {
+    const note=document.createElement('p');note.className='empty-state';
+    note.textContent=complete?'目前沒有待審核申請。':'已查詢的日期尚無待審核申請。';container.append(note);return;
+  }
+  const wrap=document.createElement('div');wrap.className='table-wrap';
+  const table=document.createElement('table');table.className='pending-table';
+  const head=document.createElement('thead'),row=document.createElement('tr');
+  for(const title of ['訪客姓名','來訪公司','日期','時間','人數','操作']){const th=document.createElement('th');th.scope='col';th.textContent=title;row.append(th);}head.append(row);table.append(head);
+  const body=document.createElement('tbody');
+  for(const app of apps){const tr=document.createElement('tr');tr.append(cell(app.VisitorList?.map(v=>v.VisitorName).filter(Boolean).join('、')||'未提供'),cell(app.VisitorCompany),cell(String(app.VisitorStartTime||'').slice(0,10)),cell(`${timePart(app.VisitorStartTime)} – ${timePart(app.VisitorEndTime)}`),cell(app.VisitorCount));
+    const actions=cell('');const group=document.createElement('div');group.className='actions';
+    for(const [label,style,action] of [['查看','outline-button',()=>showVisitorDetail(app)],['核准','approve-btn',()=>handlePendingAction(app.ApplyNo,app.EnterpriseId,'Y')],['拒絕','reject-btn',()=>handlePendingAction(app.ApplyNo,app.EnterpriseId,'R')]]){const button=document.createElement('button');button.type='button';button.className=style;button.textContent=label;button.addEventListener('click',action);group.append(button);}actions.append(group);tr.append(actions);body.append(tr);
+  }
+  table.append(body);wrap.append(table);container.append(wrap);
+}
+
+function escHtml(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML.replaceAll('"', '&quot;').replaceAll("'", '&#39;'); }
+
+async function handlePendingAction(applyNo, enterpriseId, status) {
+  if (isReviewing) return;
+  const label = status === 'Y' ? '核准' : '拒絕';
+  if (!confirm(`確定要${label}此申請？${status === 'Y' ? '核准後將由系統發送通行通知。' : ''}`)) return;
+  isReviewing = true;
+  const loading = $('pendingLoading');
+  loading.classList.remove('hidden');
+  try {
+    await apiFetch('vas/visitor-application/approve', {
+      method: 'POST',
+      body: JSON.stringify({
+        BuildingNo: authUser.buildingNo,
+        EnterpriseId: enterpriseId,
+        ApproveUser: authUser.username,
+        VisitorApplicationList: [{ ApplyNo: applyNo, ApplyStatus: status }]
+      }),
+      headers: { Authorization: `Bearer ${authToken}` }
+    });
+    // Reload pending list
+    await loadPendingApplications();
+  } catch (e) {
+    alert(`${label}失敗：` + e.message);
+  }
+  loading.classList.add('hidden');
+  isReviewing = false;
+}
+
+// ============== Result ==============
+function showResult(success, msg) {
+  formSection.classList.add('hidden');
+  resultSection.classList.remove('hidden');
+  $('resultMsg').textContent = msg;
+  if (!success) {
+    document.querySelector('.result-card .icon').textContent = '❌';
+    document.querySelector('.result-card h2').style.color = '#e00000';
+  }
+}
+
+$('newAppBtn').addEventListener('click', function() {
+  resultSection.classList.add('hidden');
+  formSection.classList.remove('hidden');
+  document.querySelector('.result-card .icon').textContent = '✅';
+  document.querySelector('.result-card h2').style.color = '#148922';
+  resetForm();
+});
+
+async function resetForm() {
+  $('reason').value = '洽公';
+  $('visitorName').value = '';
+  $('visitorCompany').value = '';
+  $('visitorMobile').value = '';
+  $('visitorEmail').value = '';
+  $('toggleAdditional').checked = false;
+  $('additionalSection').classList.add('hidden');
+  $('additionalList').innerHTML = '';
+  additionalVisitors = [];
+  hideError($('formError'));
+  const now = new Date();
+  $('visitDate').value = `${now.getFullYear()}-${pad2(now.getMonth()+1)}-${pad2(now.getDate())}`;
+  $('startTime').value = `${pad2(Math.min(now.getHours() + 1, 22))}:${pad2(0)}`;
+  $('endTime').value = `${pad2(Math.min(now.getHours() + 2, 23))}:${pad2(0)}`;
+  // Reset host fields
+  $('hostSelect').innerHTML = '<option value="">請先選擇拜訪公司</option>';
+  $('hostSelect').disabled = true;
+  reviewers = [];
+  $('hostName').value = '';
+  $('hostEmail').value = '';
+  // Reset location to defaults
+  setDefaultLocation();
+}
+
+// ============== Event Bindings ==============
+$('loginBtn').addEventListener('click', handleLogin);
+$('username').addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
+$('password').addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
+$('logoutBtn').addEventListener('click', handleLogout);
+
+// Pending reload
+$('reloadPendingBtn').addEventListener('click', loadPendingApplications);
+
+// Enter key on main form submits
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.closest('#formSection')) {
+    // Don't submit on enter for single-line inputs - it's confusing
+  }
+});
+
+console.log('✅ 訪客快速申請系統已載入');
+</script>
+<footer class="site-footer"><span>親家市政廣場 · 訪客服務</span><a href="https://vas-api.pss-group-prod.com/vas-frontstage/reviewer" target="_blank" rel="noopener noreferrer">開啟業者後台 ↗</a></footer><script src="./management.js"></script></body>
+</html>
